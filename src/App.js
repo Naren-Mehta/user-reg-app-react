@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, Fragment } from "react";
 import "./App.css";
 import UsersDashboard from "./components/Users/UsersDashboard";
 
@@ -25,9 +25,9 @@ function App() {
   };
 
   return (
-    <div>
+    <Fragment>
       <UsersDashboard userList={users} onAddNewUser={updateUserList} />;
-    </div>
+    </Fragment>
   );
 }
 

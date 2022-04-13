@@ -1,23 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import Wrapper from "../Helpers/Wrapper";
 import Button from "../UI/Button";
 import Card from "../UI/Card";
 import ErrorModal from "../UI/ErrorModal";
 import classes from "./UserForm.module.css";
 
 const UserForm = (props) => {
+  const nameInputRef = useRef();
+  const ageInputRef = useRef();
+
   const [error, setError] = useState(false);
-  const [userInput, setUserInput] = useState({
-    name: "",
-    age: "",
-  });
+
   const saveUserInfo = (event) => {
     event.preventDefault();
-    userInput.id = Math.floor(Math.random() * 1000);
+    let enteredName = nameInputRef.current.value;
+    let enteredAge = ageInputRef.current.value;
 
-    if (
-      userInput.name.trim().length === 0 ||
-      userInput.age.trim().length === 0
-    ) {
+    if (enteredName.trim().length === 0 || enteredAge.trim().length === 0) {
       setError({
         title: "Invalid Input",
         message: "Please enter a valid name and age (non-empty values).",
@@ -25,30 +24,23 @@ const UserForm = (props) => {
       return;
     }
 
-    if (+userInput.age < 1) {
+    if (+enteredAge < 1) {
       setError({
         title: "Invalid age",
         message: "Please enter a valid age (> 0).",
       });
       return;
     }
-    props.onSaveNewUsers(userInput);
-    setUserInput({
-      name: "",
-      age: "",
-    });
-  };
 
-  const updateUserName = (event) => {
-    setUserInput((previous) => {
-      return { ...previous, name: event.target.value };
-    });
-  };
-
-  const updateUserAge = (event) => {
-    setUserInput((previous) => {
-      return { ...previous, age: event.target.value };
-    });
+    let id = Math.floor(Math.random() * 1000),
+      userInputObj = {
+        id: id,
+        name: enteredName,
+        age: enteredAge,
+      };
+    props.onSaveNewUsers(userInputObj);
+    nameInputRef.current.value = "";
+    ageInputRef.current.value = "";
   };
 
   const errorHandler = () => {
@@ -56,20 +48,25 @@ const UserForm = (props) => {
   };
 
   return (
-    <div>
-      {error && <ErrorModal title={error.title} message={error.message} onConfirm={errorHandler}/>}
+    <Wrapper>
+      {error && (
+        <ErrorModal
+          title={error.title}
+          message={error.message}
+          onConfirm={errorHandler}
+        />
+      )}
       <Card className={classes.input}>
         <form onSubmit={saveUserInfo}>
           <label htmlFor="username">Username</label>
-          <input type="text" value={userInput.name} onChange={updateUserName} />
+          <input type="text" ref={nameInputRef} />
 
           <label htmlFor="age">Age(Years)</label>
-          <input type="number" value={userInput.age} onChange={updateUserAge} />
-
+          <input type="number" ref={ageInputRef} />
           <Button type="submit">Add User</Button>
         </form>
       </Card>
-    </div>
+    </Wrapper>
   );
 };
 
